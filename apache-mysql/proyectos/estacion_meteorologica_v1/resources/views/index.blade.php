@@ -20,7 +20,13 @@
             <p class="text-xs text-[#a6adc8] mt-1 uppercase tracking-widest">Monitoreo en Tiempo Real</p>
         </header>
 
-        <!-- Contenedor del Dato Principal -->
+        @php 
+            $ultimoRegistro = $registros->last(); 
+            // Todos los registros anteriores al último, en orden descendente (más reciente primero)
+            $historial = $registros->reverse()->skip(1); 
+        @endphp
+
+        <!-- Contenedor del Dato Principal (Último registro) -->
         <div class="bg-[#181825] rounded-xl py-8 px-6 my-6 border border-[#2d2d3f] shadow-inner relative overflow-hidden">
             <div class="absolute top-3 left-3 flex items-center gap-1.5">
                 <span class="flex h-2 w-2 relative">
@@ -30,13 +36,7 @@
                 <span class="text-[10px] text-[#a6adc8] font-mono uppercase">En línea</span>
             </div>
 
-            <!-- Obtener el último registro de la colección de forma segura -->
-            @php 
-                $ultimoRegistro = $registros->last(); 
-            @endphp
-
             @if($ultimoRegistro)
-                <!-- Distribución en Grid para separar Temperatura y Humedad -->
                 <div class="grid grid-cols-2 gap-4 mt-4 divide-x divide-[#2d2d3f]">
                     
                     <!-- Sección de Temperatura -->
@@ -65,13 +65,32 @@
             @endif
         </div>
 
-        <!-- Metadata: Última actualización habilitada -->
+        <!-- Metadata: Última actualización -->
         @if($ultimoRegistro)
-            <footer class="text-sm text-[#a6adc8] flex flex-col gap-1 font-mono">
+            <footer class="text-sm text-[#a6adc8] flex flex-col gap-1 font-mono mb-4">
                 <div>Última lectura: <span class="text-[#cba6f7]" id="temp-time">{{ $ultimoRegistro->created_at->format('H:i:s') }}</span></div>
-                <div class="text-[11px] text-[#6c7086] mt-4">Actualizando automáticamente cada 5 minutos...</div>
             </footer>
         @endif
+
+        <!-- Historial de registros anteriores -->
+        @if($historial->count() > 0)
+            <div class="text-left border-t border-[#3b3b4f] pt-4">
+                <h2 class="text-xs text-[#a6adc8] uppercase tracking-widest mb-3 font-mono">Historial</h2>
+                <div class="max-h-64 overflow-y-auto pr-1 space-y-2">
+                    @foreach($historial as $registro)
+                        <div class="flex items-center justify-between bg-[#181825] rounded-lg px-4 py-2 border border-[#2d2d3f]">
+                            <span class="text-[11px] text-[#6c7086] font-mono">{{ $registro->created_at->format('H:i:s') }}</span>
+                            <div class="flex gap-4 text-sm font-semibold">
+                                <span class="text-[#89b4fa]">{{ $registro->temperatura }}°C</span>
+                                <span class="text-[#a6e3a1]">{{ $registro->humedad }}%</span>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        <p class="text-[11px] text-[#6c7086] mt-4 font-mono">Actualizando automáticamente cada 5 minutos...</p>
 
     </div>
 </body>

@@ -1,9 +1,19 @@
 FROM php:8.2-apache
 
-# Instalar extensiones necesarias
-RUN apt-get update && apt-get install -y \
-    git unzip libpng-dev libonig-dev libxml2-dev zip curl \
+# Instalar extensiones necesarias + tzdata para zona horaria
+# tzdata: Paquete que contiene la base de datos de zonas horarias
+RUN apt-get update && apt-get install -y \ 
+    git unzip libpng-dev libonig-dev libxml2-dev zip curl tzdata \ 
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+
+# Configurar zona horaria del sistema
+# ln -snf: configura la hora del sistema operativo del contenedor.
+RUN ln -snf /usr/share/zoneinfo/America/El_Salvador /etc/localtime \
+    && echo "America/El_Salvador" > /etc/timezone \
+    && dpkg-reconfigure -f noninteractive tzdata
+
+# Configurar zona horaria de PHP (importante: esto es lo que usa Carbon/Laravel internamente)
+RUN echo "date.timezone=America/El_Salvador" > /usr/local/etc/php/conf.d/timezone.ini
 
 # Instalar Composer globalmente
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

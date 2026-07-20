@@ -2,6 +2,8 @@ services:
     app:
         build: .
         container_name: estacion_meteorologica
+        environment:
+            - TZ=America/El_Salvador
         ports:
             - "8080:80"
         depends_on:
@@ -19,6 +21,8 @@ services:
             - MYSQL_DATABASE=db_temperatura
             - MYSQL_USER=appuser
             - MYSQL_PASSWORD=pass
+            - TZ=America/El_Salvador
+        command: --default-time-zone='-06:00'
         ports:
             - "3307:3306"
         volumes:

@@ -1,7 +1,7 @@
 services:
     app:
         build: .
-        container_name: estacion_meteorologica
+        container_name: proyectos_laravel
         environment:
             - TZ=America/El_Salvador
         ports:
